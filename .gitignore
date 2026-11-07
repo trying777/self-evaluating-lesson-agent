@@ -1,0 +1,26 @@
+# Environment variables
+.env
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.pytest_cache/
+
+# Databases & local run logs
+*.db
+memory.db
+test_memory.db
+test_e2e_memory.db
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Outputs
+outputs/
+
+# OS files
+.DS_Store
+Thumbs.db
