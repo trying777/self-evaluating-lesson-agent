@@ -109,3 +109,4 @@ def build_pipeline() -> StateGraph:
     workflow.add_edge("fallback_terminal", END)
 
     return workflow.compile()
+
