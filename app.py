@@ -42,14 +42,6 @@ st.markdown(
 # Sidebar Configuration
 with st.sidebar:
     st.image("https://img.icons8.com/color/96/artificial-intelligence.png", width=64)
-    st.markdown("### ⚙️ Pipeline Control")
-
-    api_key_env = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY", "")
-    api_key = st.text_input("Gemini API Key", value=api_key_env, type="password", help="Free tier key from Google AI Studio")
-    if api_key:
-        os.environ["GEMINI_API_KEY"] = api_key
-
-    st.markdown("---")
     st.markdown("#### 🎯 Target Persona")
     st.info(
         "**Persona:** 12th-grade graduate from India\n"
@@ -77,7 +69,6 @@ with st.sidebar:
 
 # Main Dashboard
 st.markdown('<div class="main-header">Autonomous Self-Evaluating Lesson Generator</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">GenAI Engineer - Content Systems | Full Generate → Evaluate → Regenerate Agentic Loop</div>', unsafe_allow_html=True)
 
 # Top Bar: Memory & Evolution
 evolution = get_evolution_report()
@@ -108,7 +99,7 @@ start_button = st.button("🚀 Run Agentic Pipeline", type="primary", use_contai
 
 if start_button:
     if not os.environ.get("GEMINI_API_KEY"):
-        st.error("Please provide a valid Gemini API Key in the sidebar.")
+        st.error("Missing GEMINI_API_KEY. Please make sure it is added in your .env file.")
         st.stop()
 
     status_container = st.status("Executing Agentic Loop...", expanded=True)
