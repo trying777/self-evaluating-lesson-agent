@@ -121,8 +121,14 @@ if start_button:
         }
         
         st.write("2️⃣ Invoking LangGraph state machine: Drafting -> Evaluating -> Self-Correcting...")
-        final_state = pipeline.invoke(initial_state)
-        status_container.update(label=f"Pipeline Completed: {final_state['final_status']}", state="complete", expanded=False)
+        try:
+            final_state = pipeline.invoke(initial_state)
+            status_container.update(label=f"Pipeline Completed: {final_state['final_status']}", state="complete", expanded=False)
+        except Exception as e:
+            status_container.update(label="Pipeline Failed", state="error", expanded=True)
+            st.error(f"⚠️ **API Invocation Error:** {str(e)}")
+            st.info("Tip: If you see a model rate limit (429), restart Streamlit or check your GEMINI_MODEL setting in .env.")
+            st.stop()
 
     # Render Results
     st.markdown("---")
