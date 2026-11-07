@@ -39,6 +39,8 @@ Be objective and rigorous. Do not give the benefit of the doubt. If any checkpoi
 
 def get_evaluator_llm():
     """Initializes the structured Gemini evaluator."""
+    from dotenv import load_dotenv
+    load_dotenv()
     from langchain_google_genai import ChatGoogleGenerativeAI
     api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
     if not api_key:
@@ -46,7 +48,7 @@ def get_evaluator_llm():
             "GEMINI_API_KEY or GOOGLE_API_KEY environment variable is not set."
         )
     llm = ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash",
+        model="gemini-3.8-flash",
         temperature=0.0,  # Zero temperature for deterministic evaluation
         google_api_key=api_key,
     )
@@ -62,3 +64,4 @@ def evaluate_lesson_node(state: AgentState) -> Dict[str, Any]:
     rubric_result: LessonRubric = evaluator.invoke(prompt)
 
     return {"evaluation": rubric_result}
+
