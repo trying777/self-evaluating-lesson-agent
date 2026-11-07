@@ -47,8 +47,9 @@ def get_evaluator_llm():
         raise ValueError(
             "GEMINI_API_KEY or GOOGLE_API_KEY environment variable is not set."
         )
+    model_name = os.environ.get("GEMINI_MODEL", "gemini-3.1-flash-lite")
     llm = ChatGoogleGenerativeAI(
-        model="gemini-3.8-flash",
+        model=model_name,
         temperature=0.0,  # Zero temperature for deterministic evaluation
         google_api_key=api_key,
     )

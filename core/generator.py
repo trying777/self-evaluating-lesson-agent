@@ -54,8 +54,9 @@ def get_llm():
             "GEMINI_API_KEY or GOOGLE_API_KEY environment variable is not set. "
             "Please provide a free Google AI Studio API key."
         )
+    model_name = os.environ.get("GEMINI_MODEL", "gemini-3.1-flash-lite")
     return ChatGoogleGenerativeAI(
-        model="gemini-3.8-flash",
+        model=model_name,
         temperature=0.3,
         google_api_key=api_key,
     )
