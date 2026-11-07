@@ -1,4 +1,5 @@
 # Self-Evaluating Lesson Content Generator
+
 An autonomous agentic system built with **LangGraph** that generates beginner AI lessons, evaluates them against a strict binary pass/fail rubric, and self-corrects using a bounded retry loop and persistent cross-run memory.
 
 ---
@@ -9,52 +10,74 @@ An autonomous agentic system built with **LangGraph** that generates beginner AI
 - Python 3.10+
 - Free Google Gemini API Key from [Google AI Studio](https://aistudio.google.com/)
 
-### 2. Clone & Install Dependencies
+### 2. Clone the Repository
 ```bash
-git clone <your-repo-url>
-cd nxtwave
+git clone https://github.com/trying777/self-evaluating-lesson-agent.git
+```
 
-# Create virtual environment (optional)
+### 3. Navigate into the Project Directory
+```bash
+cd self-evaluating-lesson-agent
+```
+
+### 4. Create a Virtual Environment (Optional but Recommended)
+```bash
 python -m venv venv
-venv\Scripts\activate       # On Windows
-# source venv/bin/activate  # On macOS/Linux
+```
 
-# Install required packages
+### 5. Activate the Virtual Environment (Windows PowerShell)
+```powershell
+.\venv\Scripts\Activate.ps1
+```
+
+*(For Command Prompt, use `venv\Scripts\activate.bat`; for macOS/Linux, use `source venv/bin/activate`)*
+
+### 6. Install Dependencies
+```bash
 pip install -r requirements.txt
 ```
 
-### 3. Configure API Key
-Create a `.env` file in the project root:
+### 7. Configure Environment Variables
+Create a `.env` file in the project root directory:
+
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
 ```
+
+*(You can also copy the provided template: `cp .env.example .env`)*
 
 ---
 
 ## 💻 How to Run
 
 ### 1. Interactive Web UI (Streamlit)
-Launch the dashboard for live visual demonstration:
+Launch the interactive web dashboard:
+
 ```bash
 streamlit run app.py
 ```
-Open `http://localhost:8501` to view:
-- Live graph state execution (Drafting $\to$ Evaluating $\to$ Retrying).
-- Deliberate error injection toggle (demonstrates evaluator rejection and self-correction).
-- Final lesson markdown and detailed rejection audit logs.
+
+Open `http://localhost:8501` in your browser. The dashboard includes:
+- **Persistent Memory & Self-Evolved Guardrails:** Live inspector displaying historical failure statistics and dynamically synthesized prompt guardrails from SQLite.
+- **Test Harness Toggle:** "Inject Deliberate Error" switch to demonstrate the evaluator catching flaws on Attempt #0 and self-correcting on Attempt #1.
+- **Tab 1 (Final Lesson Content):** Displays the rendered beginner lesson with a one-click Markdown download button.
+- **Tab 2 (Rejection & Audit Log):** Detailed audit trail of failed checkpoints, line diagnostics, and corrective rewrite guidance.
+- **Tab 3 (Strict Binary Rubric Checkpoints):** Hard `PASSED`/`FAILED` quality gates across all 6 rubric dimensions with detailed justifications.
+- **Tab 4 (System Architecture & Trade-Offs):** Interactive workflow diagram and design decision rationales.
 
 ### 2. CLI Execution
-Run standard generation:
+
+Run standard generation for a topic:
 ```bash
 python main.py --topic "Introduction to RAG (Retrieval-Augmented Generation)"
 ```
 
-Run with deliberate error injection to see live evaluator rejection in the terminal:
+Run with deliberate error injection to observe evaluator rejection and self-correction live in terminal:
 ```bash
 python main.py --inject-error
 ```
 
-Output files will be saved to `outputs/`:
+Output files are automatically exported to the `outputs/` folder:
 - `outputs/final_lesson_RAG.md` (shippable lesson)
 - `outputs/rejection_audit_log.json` (audit trail)
 
@@ -62,12 +85,15 @@ Output files will be saved to `outputs/`:
 
 ## 🧪 Running Tests
 
-Run the test suite:
-```bash
-# Unit tests: Pydantic rubric, SQLite memory & routing
-python test_pipeline.py
+Run the test suite to verify the pipeline components:
 
-# End-to-end integration test (simulates full generate -> reject -> retry cycle offline)
+Run unit tests (Pydantic rubric validation, SQLite persistence, and LangGraph routing logic):
+```bash
+python test_pipeline.py
+```
+
+Run end-to-end simulation test (verifies the complete Generate $\to$ Evaluate $\to$ Feedback $\to$ Regenerate $\to$ Ship cycle offline):
+```bash
 python test_e2e_mock.py
 ```
 
@@ -97,7 +123,7 @@ flowchart TD
 ## 📁 Project Structure
 
 ```text
-nxtwave/
+self-evaluating-lesson-agent/
 ├── app.py                  # Streamlit web dashboard for live demo
 ├── main.py                 # CLI runner with telemetry and export flags
 ├── requirements.txt        # Frozen dependencies
