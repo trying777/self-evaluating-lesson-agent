@@ -123,7 +123,9 @@ def generate_lesson_node(state: AgentState) -> Dict[str, Any]:
             raise e
 
     if response is None:
-        raise last_error
+        if last_error:
+            raise last_error
+        raise RuntimeError("Generator failed to produce a draft from all candidate models.")
 
     # Cleanly extract string content across different SDK return formats
     raw_content = response.content

@@ -12,7 +12,6 @@ from memory.db import record_run, record_evaluation, init_db
 # Hard bounded retry ceiling as requested in the assessment (max 1-2 retries)
 MAX_REVISION_LIMIT = 2
 
-
 def load_memory_node(state: AgentState) -> Dict[str, Any]:
     """Retrieves self-evolved guardrails from persistent memory before generation."""
     init_db()

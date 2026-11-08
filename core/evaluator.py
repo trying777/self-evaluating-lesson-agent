@@ -81,6 +81,8 @@ def evaluate_lesson_node(state: AgentState) -> Dict[str, Any]:
             raise e
 
     if rubric_result is None:
-        raise last_error
+        if last_error:
+            raise last_error
+        raise RuntimeError("Evaluator failed to generate a response from all candidate models.")
 
     return {"evaluation": rubric_result}
