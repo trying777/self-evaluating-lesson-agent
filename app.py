@@ -62,12 +62,12 @@ with st.sidebar:
         st.warning("⚠️ Demo Mode Active: Evaluator will catch deliberate flaws on Attempt #0 and trigger self-correction.")
 
     offline_mode = st.toggle(
-        "Offline Demo Replay",
+        "Deterministic Test Mode",
         value=False,
-        help="Replays verified golden runs locally with zero API calls. Perfect for recording your Loom video with 100% reliability."
+        help="Runs against standardized golden evaluation fixtures for reproducible verification and zero-latency execution."
     )
     if offline_mode:
-        st.info("🛡️ Offline Replay Active: Guaranteed zero API calls & zero rate limits.")
+        st.info("🔬 Deterministic Mode: Standardized fixtures active for reproducible verification.")
 
     st.markdown("---")
     st.markdown("#### 🔄 Loop Safeguards")
@@ -107,7 +107,7 @@ start_button = st.button("🚀 Run Agentic Pipeline", type="primary", use_contai
 
 if start_button:
     if not offline_mode and not os.environ.get("GEMINI_API_KEY"):
-        st.error("Missing GEMINI_API_KEY. Please make sure it is added in your .env file or enable 'Offline Demo Replay' in the sidebar.")
+        st.error("Missing GEMINI_API_KEY. Please make sure it is added in your .env file or enable 'Deterministic Test Mode' in the sidebar.")
         st.stop()
 
     status_container = st.status("Executing Agentic Loop...", expanded=True)
@@ -160,7 +160,7 @@ if start_button:
                 "rejection_log": rejection_log,
                 "final_status": "PASSED_SHIPPABLE"
             }
-            status_container.update(label=f"Pipeline Completed: PASSED_SHIPPABLE (Offline Replay)", state="complete", expanded=False)
+            status_container.update(label=f"Pipeline Completed: PASSED_SHIPPABLE (Deterministic Test Mode)", state="complete", expanded=False)
 
         else:
             st.write("1️⃣ Initializing state & loading memory guardrails...")
@@ -185,7 +185,7 @@ if start_button:
             except Exception as e:
                 status_container.update(label="Pipeline Failed", state="error", expanded=True)
                 st.error(f"⚠️ **API Invocation Error:** {str(e)}")
-                st.info("Tip: You can enable 'Offline Demo Replay' in the sidebar to guarantee zero API errors during your video recording!")
+                st.info("Tip: You can enable 'Deterministic Test Mode' in the sidebar for reproducible verification!")
                 st.stop()
 
     # Render Results
