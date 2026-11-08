@@ -36,18 +36,24 @@ There is NO partial credit. Each of the following 6 checkpoints must be evaluate
 Be objective and rigorous. Do not give the benefit of the doubt. If any checkpoint fails, provide a clear, constructive explanation in the 'reason' field so the generator knows exactly what to fix.
 """
 
+CANDIDATE_MODELS = [
+    "gemini-3.1-flash-lite",
+    "gemini-flash-latest",
+    "gemini-3.5-flash-lite",
+    "gemini-2.5-flash-lite",
+]
 
-def get_evaluator_llm():
+
+def get_evaluator_llm(model_name: str = "gemini-3.1-flash-lite"):
     """Initializes the structured Gemini evaluator."""
     from dotenv import load_dotenv
-    load_dotenv()
+    load_dotenv(override=True)
     from langchain_google_genai import ChatGoogleGenerativeAI
     api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
     if not api_key:
         raise ValueError(
             "GEMINI_API_KEY or GOOGLE_API_KEY environment variable is not set."
         )
-    model_name = os.environ.get("GEMINI_MODEL", "gemini-3.1-flash-lite")
     llm = ChatGoogleGenerativeAI(
         model=model_name,
         temperature=0.0,  # Zero temperature for deterministic evaluation
@@ -61,8 +67,20 @@ def evaluate_lesson_node(state: AgentState) -> Dict[str, Any]:
     draft = state.get("current_draft", "")
     prompt = f"{EVALUATOR_SYSTEM_PROMPT}\n\n---\nLESSON DRAFT TO EVALUATE:\n{draft}\n---"
 
-    evaluator = get_evaluator_llm()
-    rubric_result: LessonRubric = evaluator.invoke(prompt)
+    last_error = None
+    rubric_result = None
+    for model_name in CANDIDATE_MODELS:
+        try:
+            evaluator = get_evaluator_llm(model_name=model_name)
+            rubric_result = evaluator.invoke(prompt)
+            break
+        except Exception as e:
+            last_error = e
+            if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e) or "quota" in str(e).lower():
+                continue
+            raise e
+
+    if rubric_result is None:
+        raise last_error
 
     return {"evaluation": rubric_result}
-

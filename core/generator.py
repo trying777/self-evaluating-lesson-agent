@@ -42,11 +42,18 @@ STRICT TONE & LANGUAGE CONSTRAINTS:
 {critique_revision_section}
 """
 
+CANDIDATE_MODELS = [
+    "gemini-3.1-flash-lite",
+    "gemini-flash-latest",
+    "gemini-3.5-flash-lite",
+    "gemini-2.5-flash-lite",
+]
 
-def get_llm():
+
+def get_llm(model_name: str = "gemini-3.1-flash-lite"):
     """Initializes the Gemini model using LangChain."""
     from dotenv import load_dotenv
-    load_dotenv()
+    load_dotenv(override=True)
     from langchain_google_genai import ChatGoogleGenerativeAI
     api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
     if not api_key:
@@ -54,7 +61,6 @@ def get_llm():
             "GEMINI_API_KEY or GOOGLE_API_KEY environment variable is not set. "
             "Please provide a free Google AI Studio API key."
         )
-    model_name = os.environ.get("GEMINI_MODEL", "gemini-3.1-flash-lite")
     return ChatGoogleGenerativeAI(
         model=model_name,
         temperature=0.3,
@@ -102,9 +108,23 @@ def generate_lesson_node(state: AgentState) -> Dict[str, Any]:
         critique_revision_section=critique_section,
     )
 
-    llm = get_llm()
-    response = llm.invoke(prompt)
-    
+    # Multi-model fallback to completely prevent 429 Resource Exhausted errors
+    last_error = None
+    response = None
+    for model_name in CANDIDATE_MODELS:
+        try:
+            llm = get_llm(model_name=model_name)
+            response = llm.invoke(prompt)
+            break
+        except Exception as e:
+            last_error = e
+            if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e) or "quota" in str(e).lower():
+                continue
+            raise e
+
+    if response is None:
+        raise last_error
+
     # Cleanly extract string content across different SDK return formats
     raw_content = response.content
     if isinstance(raw_content, list):
@@ -119,4 +139,3 @@ def generate_lesson_node(state: AgentState) -> Dict[str, Any]:
         draft_text = str(raw_content)
 
     return {"current_draft": draft_text}
-
